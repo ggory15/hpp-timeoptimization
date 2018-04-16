@@ -34,6 +34,9 @@ To install this moulde:
    cd cmake ..
    make install
    ```
+  4. (Optional) If you want to use this module in Python
+	- see https://github.com/ggory15/hpp-timeopt-corba
+  
  
 Demo
 ----
@@ -64,9 +67,9 @@ The global frame of this module is as follows:
 
 Related Works
 ----
-video (B. Pondon, "https://www.youtube.com/watch?v=ZGhSCILANDw")
+video (B. Ponton, "https://www.youtube.com/watch?v=ZGhSCILANDw")
 
-article (B. Pondon et al, "https://arxiv.org/abs/1709.09265")
+article (B. Ponton et al, "https://arxiv.org/abs/1709.09265")
 
 
 License
@@ -79,7 +82,7 @@ Credits
 + Max Planck Society (developer of time and momentum optimization)
 + Alexander Domahidi (developer of interior point solver)
 + Timothy A. Davis (developer of sparse matrix routines)
-+ B. Pondon (origianl source, https://git-amd.tuebingen.mpg.de/bponton/timeoptimization)
++ B. Ponton (origianl source, https://git-amd.tuebingen.mpg.de/bponton/timeoptimization)
 =======
 # hpp-timeoptimization
 >>>>>>> b9d9dfb009d2e2b66d131ab7951bb77674c18242
