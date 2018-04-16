@@ -38,6 +38,7 @@ To install this moulde:
 Demo
 ----
 The demo is based on DYROS-RED URDFs. The URDF files can be obtained by https://github.com/ggory15/dyrosred.
+
 Also you could use your robot's URDF file, if you rewrite some lines. 
 
 To run the demo script: 
@@ -64,6 +65,7 @@ The global frame of this module is as follows:
 Related Works
 ----
 video (B. Pondon, "https://www.youtube.com/watch?v=ZGhSCILANDw")
+
 article (B. Pondon et al, "https://arxiv.org/abs/1709.09265")
 
 
