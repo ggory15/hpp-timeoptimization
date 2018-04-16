@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # On Time Optimization of Centroidal Momentum Dynamics
 
 This is a modified version of the software for optimization of centroidal momentum dyanmics (https://git-amd.tuebingen.mpg.de/bponton/timeoptimization) in order to use in HPP (https://github.com/humanoid-path-planner). This module can generate COM trajectory for humanoid robot using time-optimization by pondon's works.
@@ -77,3 +78,6 @@ Credits
 + Alexander Domahidi (developer of interior point solver)
 + Timothy A. Davis (developer of sparse matrix routines)
 + B. Pondon (origianl source, https://git-amd.tuebingen.mpg.de/bponton/timeoptimization)
+=======
+# hpp-timeoptimization
+>>>>>>> b9d9dfb009d2e2b66d131ab7951bb77674c18242
