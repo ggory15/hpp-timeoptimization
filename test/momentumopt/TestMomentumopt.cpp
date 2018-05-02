@@ -16,7 +16,7 @@
  */
 
 #include <hpp/timeopt/momentumopt/dynopt/DynamicsOptimizer.hpp>
-#include <hpp/timeopt/momentumopt/cntopt/ContactPlanFromFile.hpp>
+#include <hpp/timeopt/momentumopt/cntopt/ContactPlanFromFootPrint.hpp>
 #include <boost/format.hpp>
 #define BOOST_TEST_MODULE test_solver
 #include <boost/test/included/unit_test.hpp>
@@ -57,53 +57,68 @@ using namespace hpp::timeopt;
     // define robot initial state
     DynamicsState ini_state;
     ini_state.fillInitialRobotState(cfg_file);
+    ini_state.setFinalcom(vector3_t(0.2, 1.2, 0.4));
+    ini_state.setMass(60.0);
 
     // define reference dynamic sequence
     DynamicsSequence ref_sequence;
     ref_sequence.resize(planner_setting.get(PlannerIntParam_NumTimesteps));
 
     // define contact plan
-    ContactPlanFromFile contact_plan;
+    ContactPlanFromFootPrint contact_plan;
     contact_plan.initialize(planner_setting);
-    contact_plan.optimize(ini_state);
+
+    FootPrints_t footPrints;
+    footPrints.push_back(FootPrint(0.0, 1.0, vector3_t(0.086, 0.15, -0.92), quaternion_t(1.0, 0.0, 0.0, 0.0), 1));
+    footPrints.push_back(FootPrint(2.0, 4.5, vector3_t(0.500, 0.45, -0.76), quaternion_t(0.9689, 0.0, -0.2474, 0.0), 1));
+    footPrints.push_back(FootPrint(6.0, 9.9, vector3_t(0.450, 0.98, -0.27), quaternion_t(1.0, 0.0, 0.0, 0.0), 1));
+
+    ContactSet con_(0, footPrints);
+    contact_plan.addContact(con_ , ini_state);
+    
+    footPrints.clear();
+    footPrints.push_back(FootPrint(0.0, 2.5, vector3_t(-0.086, 0.15, -0.92), quaternion_t(1.0, 0.0, 0.0, 0.0), 1));
+    footPrints.push_back(FootPrint(4.0, 6.5, vector3_t(-0.080, 0.70, -0.52), quaternion_t(0.96891, 0.0, 0.2474, 0.0), 1));
+    footPrints.push_back(FootPrint(8.5, 9.9, vector3_t(-0.080, 1.25, -0.25), quaternion_t(1.0, 0.0, 0.0, 0.0), 1));
+    
+    con_.reset(1, footPrints);
+    contact_plan.addContact(con_ , ini_state);
+
+
 
     // optimize motion
     DynamicsOptimizer dyn_optimizer;
     dyn_optimizer.initialize(planner_setting, ini_state, &contact_plan);
     ExitCode exit_code = dyn_optimizer.optimize(ref_sequence);
     if (tinfo) { std::cout << "  Timesteps:" << std::fixed << std::setw(4) << std::setprecision(0) << planner_setting.get(PlannerIntParam_NumTimesteps)
-    	                       << "  ActiveEff:" << std::fixed << std::setw(3) << std::setprecision(0) << planner_setting.get(PlannerIntParam_NumActiveEndeffectors)
+    	                     << "  ActiveEff:" << std::fixed << std::setw(3) << std::setprecision(0) << planner_setting.get(PlannerIntParam_NumActiveEndeffectors)
                            << "  SolveTime:" << std::fixed << std::setw(6) << std::setprecision(0) << dyn_optimizer.solveTime() << " ms"<< std::endl; }
 
     // check results
     //EXPECT_NEAR(static_cast<int>(expected_code), static_cast<int>(exit_code), PRECISION);
+    
     for (int time=0; time<dyn_optimizer.dynamicsSequence().size(); time++)
       for (int id=0; id<3; id++) {
         BOOST_CHECK_SMALL(ref_com(time,id) - dyn_optimizer.dynamicsSequence().dynamicsState(time).centerOfMass()[id] , REDUCED_PRECISION);
         BOOST_CHECK_SMALL(ref_lmom(time,id) - dyn_optimizer.dynamicsSequence().dynamicsState(time).linearMomentum()[id], REDUCED_PRECISION);
         BOOST_CHECK_SMALL(ref_amom(time,id)-  dyn_optimizer.dynamicsSequence().dynamicsState(time).angularMomentum()[id], REDUCED_PRECISION);
       }
+      
   } 
   
   BOOST_AUTO_TEST_SUITE (test_momentumopt)
   // Testing SoftConstraints Momentum Optimizer with Parallel Interior Point Solver
   BOOST_AUTO_TEST_CASE(test_SoftConstraints_MomentumOptimizer_IPSolver) {
     testProblem(TEST_PATH+std::string("momopt_demos/cfg_momSc_demo01.yaml"), "MomSc01", ExitCode::Optimal, display_time_info);
-    testProblem(TEST_PATH+std::string("momopt_demos/cfg_momSc_demo02.yaml"), "MomSc02", ExitCode::Optimal, display_time_info);
-    testProblem(TEST_PATH+std::string("momopt_demos/cfg_momSc_demo03.yaml"), "MomSc03", ExitCode::Optimal, display_time_info);
   }
 
   // Testing TrustRegion Momentum Optimizer with Interior Point Solver
   BOOST_AUTO_TEST_CASE(test_TrustRegion_MomentumOptimizer_IPSolver) {
     testProblem(TEST_PATH+std::string("momopt_demos/cfg_momTr_demo01.yaml"), "MomTr01", ExitCode::Optimal, display_time_info);
-    testProblem(TEST_PATH+std::string("momopt_demos/cfg_momTr_demo02.yaml"), "MomTr02", ExitCode::Optimal, display_time_info);
-    testProblem(TEST_PATH+std::string("momopt_demos/cfg_momTr_demo03.yaml"), "MomTr03", ExitCode::Optimal, display_time_info);
   }
 
   // Testing Time Optimizer with Interior Point Solver
   BOOST_AUTO_TEST_CASE(test_TimeMomentumOptimizer_IPSolver) {
 	testProblem(TEST_PATH+std::string("timeopt_demos/cfg_timeopt_demo01.yaml"), "Time01", ExitCode::Optimal, display_time_info);
-	testProblem(TEST_PATH+std::string("timeopt_demos/cfg_timeopt_demo02.yaml"), "Time02", ExitCode::Optimal, display_time_info);
-	testProblem(TEST_PATH+std::string("timeopt_demos/cfg_timeopt_demo03.yaml"), "Time03", ExitCode::Optimal, display_time_info);
   }
   BOOST_AUTO_TEST_SUITE_END()

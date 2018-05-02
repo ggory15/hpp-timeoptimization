@@ -55,9 +55,9 @@ set(INCLUDE_DIR "${PROJECT_SOURCE_DIR}/include")
 SET(${PROJECT_NAME}_HEADERS
   include/hpp/timeopt/fwd.hh
 
-  include/hpp/timeopt/momentumopt/cntopt/ContactPlanFromFile.hpp
   include/hpp/timeopt/momentumopt/cntopt/ContactPlanInterface.hpp
   include/hpp/timeopt/momentumopt/cntopt/ContactState.hpp
+  include/hpp/timeopt/momentumopt/cntopt/ContactPlanFromFootPrint.hpp
 
   include/hpp/timeopt/momentumopt/dynopt/DynamicsOptimizer.hpp
   include/hpp/timeopt/momentumopt/dynopt/DynamicsState.hpp
@@ -65,7 +65,9 @@ SET(${PROJECT_NAME}_HEADERS
   include/hpp/timeopt/momentumopt/setting/Definitions.hpp
   include/hpp/timeopt/momentumopt/setting/PlannerParams.hpp
   include/hpp/timeopt/momentumopt/setting/PlannerSetting.hpp
-
+  include/hpp/timeopt/momentumopt/setting/Foot-print.hpp
+  include/hpp/timeopt/momentumopt/setting/Robot-state.hpp
+  
   include/hpp/timeopt/momentumopt/utilities/Clock.hpp
 
   include/hpp/timeopt/opt_solver/optimizer/EqRoutine.hpp
@@ -101,6 +103,7 @@ get_filename_component(CONFIG_PATH config ABSOLUTE)
 ADD_SUBDIRECTORY(src)
 ADD_SUBDIRECTORY(test/opt_solver)
 ADD_SUBDIRECTORY(test/momentumopt)
+ADD_SUBDIRECTORY(test/setting)
 
 ADD_SUBDIRECTORY(demos)
 

@@ -21,8 +21,8 @@
 
 # include <vector>
 # include <Eigen/Core>
-# include <hpp/pinocchio/fwd.hh>
 # include <hpp/core/fwd.hh>
+# include <hpp/pinocchio/fwd.hh>
 # include <hpp/timeopt/yaml_eigen.h>
 # include <hpp/timeopt/config.hh>
 
@@ -59,10 +59,6 @@ namespace hpp {
     typedef pinocchio::LiegroupElement LiegroupElement;
     typedef pinocchio::LiegroupSpace LiegroupSpace;
     typedef pinocchio::LiegroupSpacePtr_t LiegroupSpacePtr_t;
-
-    HPP_PREDEF_CLASS (COMPath);
-    typedef boost::shared_ptr <COMPath> COMPathPtr_t;
-
   } // namespace timeopt
 } // namespace hpp
 

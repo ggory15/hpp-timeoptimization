@@ -189,7 +189,7 @@ namespace hpp{
         int size_, num_vars_;
 
         /*! helper double variables for the optimization problem */
-        double solve_time_, convergence_err_, last_convergence_err_;
+        double solve_time_, convergence_err_, last_convergence_err_, mass_times_gravity_;
 
         /*! helper vector variables for the optimization problem */
         Eigen::Vector3d com_pos_goal_;

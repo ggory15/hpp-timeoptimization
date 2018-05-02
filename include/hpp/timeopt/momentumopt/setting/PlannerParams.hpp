@@ -31,7 +31,7 @@ namespace hpp{
 
       /*! Available boolean variables used by the planner */
       enum PlannerBoolParam {
-        // Planner parameters
+            // Planner parameters
             PlannerBoolParam_IsTimeHorizonFixed,
             PlannerBoolParam_IsFrictionConeLinear,
 
@@ -56,9 +56,9 @@ namespace hpp{
             PlannerDoubleParam_MinTimeResidualImprovement,
 
             // Optimization weights
-        PlannerDoubleParam_WeightArmTorque,
+            PlannerDoubleParam_WeightArmTorque,
             PlannerDoubleParam_WeightLegTorque,
-        PlannerDoubleParam_WeightTimePenalty,
+            PlannerDoubleParam_WeightTimePenalty,
             PlannerDoubleParam_WeightTimeRegularization,
       };
 
@@ -87,18 +87,18 @@ namespace hpp{
             PlannerVectorParam_MaxEndeffectorLengths,
 
             // Dynamics optimization weights
-        PlannerVectorParam_WeightArmForce,
+            PlannerVectorParam_WeightArmForce,
             PlannerVectorParam_WeightLegForce,
             PlannerVectorParam_WeightArmForceRate,
             PlannerVectorParam_WeightLegForceRate,
             PlannerVectorParam_WeightCenterOfMass,
             PlannerVectorParam_WeightLinearMomentum,
             PlannerVectorParam_WeightAngularMomentum,
-        PlannerVectorParam_WeightLinearMomentumRate,
-        PlannerVectorParam_WeightAngularMomentumRate,
+            PlannerVectorParam_WeightLinearMomentumRate,
+            PlannerVectorParam_WeightAngularMomentumRate,
             PlannerVectorParam_WeightFinalLinearMomentum,
             PlannerVectorParam_WeightCenterOfMassViapoint,
-        PlannerVectorParam_WeightFinalAngularMomentum,
+            PlannerVectorParam_WeightFinalAngularMomentum,
             PlannerVectorParam_WeightDynamicTrackingLinearMomentum,
             PlannerVectorParam_WeightDynamicTrackingAngularMomentum,
       };

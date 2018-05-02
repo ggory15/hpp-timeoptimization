@@ -33,14 +33,15 @@ SET(${LIBRARY_NAME}_SOURCES
   opt_solver/interface/OptVar.cpp
   opt_solver/interface/Var.cpp
 
-  momentumopt/cntopt/ContactPlanFromFile.cpp
-  momentumopt/cntopt/ContactPlanInterface.cpp
   momentumopt/cntopt/ContactState.cpp
+  momentumopt/cntopt/ContactPlanFromFootPrint.cpp
+  momentumopt/cntopt/ContactPlanInterface.cpp
 
   momentumopt/dynopt/DynamicsState.cpp
   momentumopt/dynopt/DynamicsOptimizer.cpp
 
   momentumopt/setting/PlannerSetting.cpp
+  momentumopt/setting/Robot-state.cpp
   )
 
 ADD_LIBRARY(${LIBRARY_NAME}

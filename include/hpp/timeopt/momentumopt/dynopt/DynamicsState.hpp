@@ -40,67 +40,72 @@ namespace hpp{
       struct DynamicsState
       {
         public:
-              EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-              typedef std::array<int, Problem::n_endeffs_> IntArray;
-              typedef std::array<bool, Problem::n_endeffs_> BoolArray;
-              typedef std::array<ContactType, Problem::n_endeffs_> CntTypeArray;
-              typedef std::array<Eigen::Vector3d, Problem::n_endeffs_> Vec3dArray;
-              typedef std::array<Eigen::Quaternion<double>, Problem::n_endeffs_> OriArray;
+            EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+            typedef std::array<int, Problem::n_endeffs_> IntArray;
+            typedef std::array<bool, Problem::n_endeffs_> BoolArray;
+            typedef std::array<ContactType, Problem::n_endeffs_> CntTypeArray;
+            typedef std::array<Eigen::Vector3d, Problem::n_endeffs_> Vec3dArray;
+            typedef std::array<Eigen::Quaternion<double>, Problem::n_endeffs_> OriArray;
 
         public:
-              DynamicsState();
-              ~DynamicsState(){}
+            DynamicsState();
+            ~DynamicsState(){}
 
-              // Center of mass, linear and angular momenta
-              double& time() { return dtime_; }
-              Eigen::Vector3d& centerOfMass() { return com_; }
-              Eigen::Vector3d& linearMomentum() { return lmom_; }
-              Eigen::Vector3d& angularMomentum() { return amom_; }
-              Eigen::Vector3d& linearMomentumRate() { return lmomd_; }
-              Eigen::Vector3d& angularMomentumRate() { return amomd_; }
+            // Center of mass, linear and angular momenta
+            double& time() { return dtime_; }
+            double& mass() { return mass_; }
+            Eigen::Vector3d& centerOfMass() { return com_; }
+            Eigen::Vector3d& linearMomentum() { return lmom_; }
+            Eigen::Vector3d& angularMomentum() { return amom_; }
+            Eigen::Vector3d& linearMomentumRate() { return lmomd_; }
+            Eigen::Vector3d& angularMomentumRate() { return amomd_; }
+            Eigen::Vector3d& desiredcenterOfMass() { return comd_; }
 
-              const double& time() const { return dtime_; }
-              const Eigen::Vector3d& centerOfMass() const { return com_; }
-              const Eigen::Vector3d& linearMomentum() const { return lmom_; }
-              const Eigen::Vector3d& angularMomentum() const { return amom_; }
-              const Eigen::Vector3d& linearMomentumRate() const { return lmomd_; }
-              const Eigen::Vector3d& angularMomentumRate() const { return amomd_; }
+            const double& time() const { return dtime_; }
+            const double& mass() const { return mass_; }
+            const Eigen::Vector3d& centerOfMass() const { return com_; }
+            const Eigen::Vector3d& linearMomentum() const { return lmom_; }
+            const Eigen::Vector3d& angularMomentum() const { return amom_; }
+            const Eigen::Vector3d& linearMomentumRate() const { return lmomd_; }
+            const Eigen::Vector3d& angularMomentumRate() const { return amomd_; }
+            const Eigen::Vector3d& desiredcenterOfMass() const { return comd_; }
 
-          // Endeffector ids, forces, torques and cops
-          int& endeffectorActivationId(int eef_id) { return eefs_ids_[eef_id]; }
-          Eigen::Vector3d& endeffectorCoP(int eef_id) { return eefs_cops_[eef_id]; }
-          Eigen::Vector3d& endeffectorForce(int eef_id) { return eefs_frcs_[eef_id]; }
-          Eigen::Vector3d& endeffectorTorque(int eef_id) { return eefs_trqs_[eef_id]; }
+            // Endeffector ids, forces, torques and cops
+            int& endeffectorActivationId(int eef_id) { return eefs_ids_[eef_id]; }
+            Eigen::Vector3d& endeffectorCoP(int eef_id) { return eefs_cops_[eef_id]; }
+            Eigen::Vector3d& endeffectorForce(int eef_id) { return eefs_frcs_[eef_id]; }
+            Eigen::Vector3d& endeffectorTorque(int eef_id) { return eefs_trqs_[eef_id]; }
 
-          const int& endeffectorActivationId(int eef_id) const { return eefs_ids_[eef_id]; }
-          const Eigen::Vector3d& endeffectorCoP(int eef_id) const { return eefs_cops_[eef_id]; }
-          const Eigen::Vector3d& endeffectorForce(int eef_id) const { return eefs_frcs_[eef_id]; }
-          const Eigen::Vector3d& endeffectorTorque(int eef_id) const { return eefs_trqs_[eef_id]; }
+            const int& endeffectorActivationId(int eef_id) const { return eefs_ids_[eef_id]; }
+            const Eigen::Vector3d& endeffectorCoP(int eef_id) const { return eefs_cops_[eef_id]; }
+            const Eigen::Vector3d& endeffectorForce(int eef_id) const { return eefs_frcs_[eef_id]; }
+            const Eigen::Vector3d& endeffectorTorque(int eef_id) const { return eefs_trqs_[eef_id]; }
 
-              // Endeffector activations, positions, orientations and contact types
-              bool& endeffectorActivation(int eef_id) { return eefs_activation_[eef_id]; }
-              Eigen::Vector3d& endeffectorPosition(int eef_id) { return eefs_position_[eef_id]; }
-              ContactType& endeffectorContactType(int eef_id) { return eefs_contact_type_[eef_id]; }
-              Eigen::Quaternion<double>& endeffectorOrientation(int eef_id) { return eefs_orientation_[eef_id]; }
+            // Endeffector activations, positions, orientations and contact types
+            bool& endeffectorActivation(int eef_id) { return eefs_activation_[eef_id]; }
+            Eigen::Vector3d& endeffectorPosition(int eef_id) { return eefs_position_[eef_id]; }
+            ContactType& endeffectorContactType(int eef_id) { return eefs_contact_type_[eef_id]; }
+            Eigen::Quaternion<double>& endeffectorOrientation(int eef_id) { return eefs_orientation_[eef_id]; }
 
-              bool endeffectorActivation(int eef_id) const { return eefs_activation_[eef_id]; }
-              const Eigen::Vector3d& endeffectorPosition(int eef_id) const { return eefs_position_[eef_id]; }
-              const ContactType& endeffectorContactType(int eef_id) const { return eefs_contact_type_[eef_id]; }
-              const Eigen::Quaternion<double>& endeffectorOrientation(int eef_id) const  { return eefs_orientation_[eef_id]; }
+            bool endeffectorActivation(int eef_id) const { return eefs_activation_[eef_id]; }
+            const Eigen::Vector3d& endeffectorPosition(int eef_id) const { return eefs_position_[eef_id]; }
+            const ContactType& endeffectorContactType(int eef_id) const { return eefs_contact_type_[eef_id]; }
+            const Eigen::Quaternion<double>& endeffectorOrientation(int eef_id) const  { return eefs_orientation_[eef_id]; }
 
-              // Helper functions
-              std::string toString() const;
-              friend std::ostream& operator<<(std::ostream &os, const DynamicsState& obj) { return os << obj.toString(); }
-              void fillInitialRobotState(const std::string cfg_file, const std::string robot_state = "initial_robot_configuration");
+            // Helper functions
+            std::string toString() const;
+            friend std::ostream& operator<<(std::ostream &os, const DynamicsState& obj) { return os << obj.toString(); }
+            void fillInitialRobotState(const std::string cfg_file, const std::string robot_state = "initial_robot_configuration");
 
-              // Helper functions for HPP
-              void fillInitialBodyState(const DevicePtr_t& robot, const vector3_t& lmom=Eigen::Vector3d::Zero(), const vector3_t& amom=Eigen::Vector3d::Zero());
-              void fillInitialLimbState(const JointPtr_t& joint, const bool& active, const int& eff_id, const vector3_t& force_ratio=Eigen::Vector3d::Zero());
-
+            // Helper functions for HPP
+            void fillInitialBodyState(const double& mass, const vector3_t& com, const vector3_t& lmom=Eigen::Vector3d::Zero(), const vector3_t& amom=Eigen::Vector3d::Zero());
+            void fillInitialLimbState(const Transform3f& transform, const int& eff_id, const bool& active, const vector3_t& force_ratio=Eigen::Vector3d::Zero());
+            void setFinalcom(const vector3_t& com_goal){comd_ = com_goal;}
+            void setMass(const double& mass) {mass_ = mass;}
 
         private:
-              double dtime_;
-              Eigen::Vector3d com_, amom_, lmom_, amomd_, lmomd_;
+              double dtime_, mass_;
+              Eigen::Vector3d com_, amom_, lmom_, amomd_, lmomd_, comd_;
 
               IntArray eefs_ids_;
               BoolArray eefs_activation_;

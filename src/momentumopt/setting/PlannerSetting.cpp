@@ -45,7 +45,7 @@ namespace hpp{
           readParameter(planner_vars, "n_act_eefs", num_act_eefs_);
           readParameter(planner_vars, "time_horizon", time_horizon_);
           readParameter(planner_vars, "external_force", external_force_);
-          readParameter(planner_vars, "com_displacement", com_displacement_);
+
           if (readParameter<std::string>(planner_vars, "heuristic").compare("TrustRegion")==0) { heuristic_ = Heuristic::TrustRegion; }
           else if (readParameter<std::string>(planner_vars, "heuristic").compare("SoftConstraint")==0) { heuristic_ = Heuristic::SoftConstraint; }
           else if (readParameter<std::string>(planner_vars, "heuristic").compare("TimeOptimization")==0) { heuristic_ = Heuristic::TimeOptimization; }
@@ -60,7 +60,7 @@ namespace hpp{
 
           // Configuration parameters
           readParameter(planner_vars, "gravity", gravity_);
-          readParameter(planner_vars, "robot_mass", robot_mass_);
+          //readParameter(planner_vars, "robot_mass", robot_mass_);
           readParameter(planner_vars, "torque_range", torque_range_);
           readParameter(planner_vars, "friction_coeff", friction_coeff_);
           readParameter(planner_vars, "max_eef_lengths", max_eef_lengths_);
@@ -103,7 +103,6 @@ namespace hpp{
           // Solver setting
           readParameter(planner_vars, "use_default_solver_setting", use_default_solver_setting_);
 
-          mass_times_gravity_ = robot_mass_ * gravity_;
           gravity_vector_ = Eigen::Vector3d(0., 0., -gravity_);
           num_timesteps_ = std::floor(time_horizon_/time_step_);
         }
@@ -163,10 +162,7 @@ namespace hpp{
 
           // Configuration parameters
           case PlannerDoubleParam_Gravity : { return gravity_; }
-          case PlannerDoubleParam_RobotMass : { return robot_mass_; }
-          case PlannerDoubleParam_RobotWeight : { return mass_times_gravity_; }
           case PlannerDoubleParam_FrictionCoefficient : { return friction_coeff_; }
-          case PlannerDoubleParam_MassTimesGravity : { return mass_times_gravity_; }
 
           // Dynamics optimization weights
           case PlannerDoubleParam_WeightArmTorque : { return w_trq_arm_; }
@@ -314,10 +310,7 @@ namespace hpp{
 
           // Configuration parameters
           case PlannerDoubleParam_Gravity : { return gravity_; }
-          case PlannerDoubleParam_RobotMass : { return robot_mass_; }
-          case PlannerDoubleParam_RobotWeight : { return mass_times_gravity_; }
           case PlannerDoubleParam_FrictionCoefficient : { return friction_coeff_; }
-          case PlannerDoubleParam_MassTimesGravity : { return mass_times_gravity_; }
 
           // Dynamics optimization weights
           case PlannerDoubleParam_WeightArmTorque : { return w_trq_arm_; }

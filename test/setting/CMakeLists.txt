@@ -19,6 +19,7 @@
 
 INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIRS})
 INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/src)
+INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/include)
 
 # ADD_TESTCASE(NAME)
 # ------------------------
@@ -35,10 +36,6 @@ MACRO(ADD_TESTCASE NAME GENERATED)
     ADD_UNIT_TEST(${NAME} ${NAME}.cpp)
   ENDIF()
 
-  PKG_CONFIG_USE_DEPENDENCY(${NAME} hpp-core)
- # PKG_CONFIG_USE_DEPENDENCY(${NAME} roboptim-trajectory)
- # PKG_CONFIG_USE_DEPENDENCY(${NAME} hpp-util)
-
   # Link against Boost and project library.
   TARGET_LINK_LIBRARIES(${NAME}
     ${Boost_LIBRARIES} 
@@ -46,12 +43,13 @@ MACRO(ADD_TESTCASE NAME GENERATED)
     yaml-cpp
     hpp-core
     hpp-pinocchio
-    hpp-timeopt
     )
+    PKG_CONFIG_USE_DEPENDENCY(${NAME} hpp-core)
+    PKG_CONFIG_USE_DEPENDENCY(${NAME} hpp-pinocchio)
 ENDMACRO(ADD_TESTCASE)
 
+ADD_TESTCASE(robot FALSE)
+#set_target_properties(foot PROPERTIES COMPILE_DEFINITIONS TEST_PATH="${TEST_PATH}/opt_solver/yaml_config_files/")
 
-ADD_TESTCASE(TestMomentumopt FALSE)
-set_target_properties(TestMomentumopt PROPERTIES COMPILE_DEFINITIONS TEST_PATH="${TEST_PATH}/momentumopt/yaml_config_files/")
 
 
