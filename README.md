@@ -83,6 +83,4 @@ Credits
 + Alexander Domahidi (developer of interior point solver)
 + Timothy A. Davis (developer of sparse matrix routines)
 + B. Ponton (origianl source, https://git-amd.tuebingen.mpg.de/bponton/timeoptimization)
-=======
-# hpp-timeoptimization
->>>>>>> b9d9dfb009d2e2b66d131ab7951bb77674c18242
+
