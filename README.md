@@ -37,7 +37,15 @@ To install this moulde:
   4. (Optional) If you want to use this module in Python
 	- see https://github.com/ggory15/hpp-timeopt-corba
   
- 
+Inputs & Outputs of Algorithm
+----
+   1. Inputs
+   	robot's mass, robot's initial com, desired contact sequences, (ref) linear and angular momentum (mainly all zeros)
+	robot's desired com at final state, etc.
+   2. Outpus
+   	time sequence(especially, timeoptimization mode) 
+	robot's continous com, linear & angular momentum trajectories, etc. 
+
 Demo
 ----
 The demo is based on DYROS-RED URDFs. The URDF files can be obtained by https://github.com/ggory15/dyrosred.
