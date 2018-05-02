@@ -726,12 +726,11 @@ namespace hpp{
               for (int cnt_id = 0; cnt_id < num; cnt_id++){
                 foot_state(0) = contact_plan_->contactSequence().endeffectorContacts(eff_id)[cnt_id].contactActivationTime();
                 foot_state(1) = contact_plan_->contactSequence().endeffectorContacts(eff_id)[cnt_id].contactDeactivationTime();
-                foot_state.segment(2,2) = contact_plan_->contactSequence().endeffectorContacts(eff_id)[cnt_id].contactPosition();
+                foot_state.segment(2,3) = contact_plan_->contactSequence().endeffectorContacts(eff_id)[cnt_id].contactPosition();
                 foot_state(5) = contact_plan_->contactSequence().endeffectorContacts(eff_id)[cnt_id].contactOrientation().x();
                 foot_state(6) = contact_plan_->contactSequence().endeffectorContacts(eff_id)[cnt_id].contactOrientation().y();
                 foot_state(7) = contact_plan_->contactSequence().endeffectorContacts(eff_id)[cnt_id].contactOrientation().z();
                 foot_state(8) = contact_plan_->contactSequence().endeffectorContacts(eff_id)[cnt_id].contactOrientation().w();
-
                 qcqp_cfg["cntopt_params"]["contact_sequence_" + std::to_string(eff_id)+"  #" + std::to_string(cnt_id)] = foot_state;
               }              
             }          

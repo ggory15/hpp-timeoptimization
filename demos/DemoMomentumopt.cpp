@@ -10,7 +10,6 @@
 
 #include <hpp/timeopt/momentumopt/dynopt/DynamicsOptimizer.hpp>
 #include <hpp/timeopt/momentumopt/cntopt/ContactPlanFromFootPrint.hpp>
-#include <hpp/timeopt/momentumopt/setting/Robot-state.hpp>
 
 using namespace hpp::timeopt;
 
@@ -55,17 +54,16 @@ int main( int argc, char *argv[] )
               0, 0,
               -0.1754, -0.4363, -0.5453, 1.3963, 2.618, 0, 0, 0;
   
-  RobotState robot_(red);
-  robot_.updateforwardkinematics(standing);
-  robot_.computeAllTerms();
+  red->currentConfiguration(standing);
+  red->computeForwardKinematics(); 
 
-  ini_state.fillInitialBodyState(robot_.getMass(), robot_.getCOM());
+  ini_state.fillInitialBodyState(red);
 
   // id_right_foot = 0, id_left_foot  = 1, id_right_hand = 2, id_left_hand  = 3  
-  ini_state.fillInitialLimbState(robot_.getFrameTransformation(robot_.getFrameId("r_sole")), 0, true, Eigen::Vector3d(0, 0, 0.5));
-  ini_state.fillInitialLimbState(robot_.getFrameTransformation(robot_.getFrameId("l_sole")), 1, true, Eigen::Vector3d(0, 0, 0.5));
-  ini_state.fillInitialLimbState(robot_.getFrameTransformation(robot_.getFrameId("J_lwrist2")), 2, false);
-  ini_state.fillInitialLimbState(robot_.getFrameTransformation(robot_.getFrameId("J_rwrist2")), 3, false);
+  ini_state.fillInitialLimbState(red->getJointByName("AnkleRoll_R_Joint"), 0, true, Eigen::Vector3d(0, 0, 0.5));
+  ini_state.fillInitialLimbState(red->getJointByName("AnkleRoll_L_Joint"), 1, true, Eigen::Vector3d(0, 0, 0.5));
+  ini_state.fillInitialLimbState(red->getJointByName("J_rwrist2"), 2, false);
+  ini_state.fillInitialLimbState(red->getJointByName("J_lwrist2"), 3, false);
 
   // define reference dynamic sequence
   DynamicsSequence ref_sequence;
@@ -92,7 +90,7 @@ int main( int argc, char *argv[] )
   contact_plan.addContact(con_ , ini_state);
 
   // define goal com
-  ini_state.setFinalcom(vector3_t(1.05, -0.20, 0.6) + robot_.getCOM());
+  ini_state.setFinalcom(vector3_t(-0.94092, -0.20, 1.39981));
   // optimize motion
   DynamicsOptimizer dyn_optimizer;
   dyn_optimizer.initialize(planner_setting, ini_state, &contact_plan);

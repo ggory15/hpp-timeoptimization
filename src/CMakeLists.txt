@@ -41,7 +41,6 @@ SET(${LIBRARY_NAME}_SOURCES
   momentumopt/dynopt/DynamicsOptimizer.cpp
 
   momentumopt/setting/PlannerSetting.cpp
-  momentumopt/setting/Robot-state.cpp
   )
 
 ADD_LIBRARY(${LIBRARY_NAME}

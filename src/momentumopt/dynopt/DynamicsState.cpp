@@ -19,7 +19,7 @@
 
 #include "hpp/pinocchio/center-of-mass-computation.hh"
 #include <hpp/pinocchio/device.hh>
-#include "hpp/pinocchio/joint.hh"
+#include <hpp/pinocchio/joint.hh>
 #include "hpp/pinocchio/urdf/util.hh"
 
 using namespace hpp::pinocchio::urdf;
@@ -97,17 +97,23 @@ namespace hpp{
         }
       }
 
-      void DynamicsState::fillInitialBodyState(const double& mass, const vector3_t& com, const vector3_t& lmom, const vector3_t& amom){
-          mass_ = mass;
-          com_ = com;
+      void DynamicsState::fillInitialBodyState(const DevicePtr_t& robot, const vector3_t& lmom, const vector3_t& amom){
+          CenterOfMassComputationPtr_t comc = CenterOfMassComputation::create (robot);
+          comc->add (robot->rootJoint ());
+          comc->compute (hpp::pinocchio::Device::COM);
+          com_ = comc->com();
+          mass_ = comc->mass();       
+          
           lmom_=lmom;
           amom_=amom;
       }
-      void DynamicsState::fillInitialLimbState(const Transform3f& transform, const int& eff_id, const bool& active, const vector3_t& force_ratio){
-          eefs_activation_[eff_id] = active;
-          eefs_orientation_[eff_id] = transform.rotation();
-          eefs_position_[eff_id] = transform.translation();
-          eefs_frcs_[eff_id] = force_ratio;
+      void DynamicsState::fillInitialLimbState(const JointPtr_t& joint, const int& eff_id, const bool& active, const vector3_t& force_ratio){
+        Transform3f tf  (joint->currentTransformation ());
+
+        eefs_activation_[eff_id] = active;
+        eefs_orientation_[eff_id] = tf.rotation();
+        eefs_position_[eff_id] = tf.translation();
+        eefs_frcs_[eff_id] = force_ratio;
       }
 
       // DynamicsSequence class function implementations

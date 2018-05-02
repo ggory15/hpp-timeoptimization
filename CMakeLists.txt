@@ -66,7 +66,6 @@ SET(${PROJECT_NAME}_HEADERS
   include/hpp/timeopt/momentumopt/setting/PlannerParams.hpp
   include/hpp/timeopt/momentumopt/setting/PlannerSetting.hpp
   include/hpp/timeopt/momentumopt/setting/Foot-print.hpp
-  include/hpp/timeopt/momentumopt/setting/Robot-state.hpp
   
   include/hpp/timeopt/momentumopt/utilities/Clock.hpp
 
@@ -103,7 +102,6 @@ get_filename_component(CONFIG_PATH config ABSOLUTE)
 ADD_SUBDIRECTORY(src)
 ADD_SUBDIRECTORY(test/opt_solver)
 ADD_SUBDIRECTORY(test/momentumopt)
-ADD_SUBDIRECTORY(test/setting)
 
 ADD_SUBDIRECTORY(demos)
 

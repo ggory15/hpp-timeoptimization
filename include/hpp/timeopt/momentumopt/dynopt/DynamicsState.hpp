@@ -98,8 +98,8 @@ namespace hpp{
             void fillInitialRobotState(const std::string cfg_file, const std::string robot_state = "initial_robot_configuration");
 
             // Helper functions for HPP
-            void fillInitialBodyState(const double& mass, const vector3_t& com, const vector3_t& lmom=Eigen::Vector3d::Zero(), const vector3_t& amom=Eigen::Vector3d::Zero());
-            void fillInitialLimbState(const Transform3f& transform, const int& eff_id, const bool& active, const vector3_t& force_ratio=Eigen::Vector3d::Zero());
+            void fillInitialBodyState(const DevicePtr_t& robot, const vector3_t& lmom=Eigen::Vector3d::Zero(), const vector3_t& amom=Eigen::Vector3d::Zero());
+            void fillInitialLimbState(const JointPtr_t& joint, const int& eff_id, const bool& active, const vector3_t& force_ratio=Eigen::Vector3d::Zero());
             void setFinalcom(const vector3_t& com_goal){comd_ = com_goal;}
             void setMass(const double& mass) {mass_ = mass;}
 
