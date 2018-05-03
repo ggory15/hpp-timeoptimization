@@ -98,7 +98,7 @@ namespace hpp{
       }
 
       void DynamicsState::fillInitialBodyState(const DevicePtr_t& robot, const vector3_t& lmom, const vector3_t& amom){
-          com_ << robot->positionCenterOfMass()[0], robot->positionCenterOfMass()[1], robot->positionCenterOfMass()[2];
+          com_ << robot->positionCenterOfMass();
           mass_ = robot->mass();          
           lmom_=lmom;
           amom_=amom;
