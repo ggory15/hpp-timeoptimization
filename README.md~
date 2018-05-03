@@ -4,10 +4,6 @@ This is a modified version of the software for optimization of centroidal moment
 
 Dependencies
 ----
-This branch is to generate COM (and others) path for using RBPRM moduels (https://github.com/stonneau/hpp-rbprm). This module is warking on Ubuntu 14.04 
-
-Dependencies
-----
 The present software depends on several packages which have to be available in Ubuntu 14.04 / 16.04
 
 -Libraries
