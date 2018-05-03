@@ -40,8 +40,6 @@ MACRO(ADD_TESTCASE NAME GENERATED)
     ${Boost_LIBRARIES} 
     ${PROJECT_NAME}
     yaml-cpp
-    hpp-core
-    hpp-pinocchio
     hpp-timeopt
     )
 ENDMACRO(ADD_TESTCASE)
