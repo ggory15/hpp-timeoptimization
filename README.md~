@@ -2,7 +2,7 @@
 
 This is a modified version of the software for optimization of centroidal momentum dyanmics (https://git-amd.tuebingen.mpg.de/bponton/timeoptimization) in order to use in HPP (https://github.com/humanoid-path-planner). This module can generate COM trajectory for humanoid robot using time-optimization by pondon's works.
 
-Branch information
+Dependencies
 ----
 This branch is to generate COM (and others) path for using RBPRM moduels (https://github.com/stonneau/hpp-rbprm). This module is warking on Ubuntu 14.04 
 
