@@ -1,26 +1,17 @@
 #include <iomanip>
 #include <yaml-cpp/yaml.h>
 
-#include "hpp/pinocchio/urdf/util.hh"
-#include "hpp/pinocchio/humanoid-robot.hh"
-#include "hpp/pinocchio/center-of-mass-computation.hh"
-#include "hpp/pinocchio/joint.hh"
-#include "hpp/pinocchio/configuration.hh"
-#include <hpp/pinocchio/device.hh>
+#include <hpp/model/joint.hh>
+#include <hpp/model/device.hh>
+#include <hpp/model/urdf/util.hh>
 
 #include <hpp/timeopt/momentumopt/dynopt/DynamicsOptimizer.hpp>
 #include <hpp/timeopt/momentumopt/cntopt/ContactPlanFromFootPrint.hpp>
 
 using namespace hpp::timeopt;
 
-using hpp::pinocchio::HumanoidRobot;
-using hpp::pinocchio::HumanoidRobotPtr_t;
-using namespace hpp::pinocchio::urdf;
-using hpp::pinocchio::Configuration_t;
-using hpp::pinocchio::CenterOfMassComputation;
-using hpp::pinocchio::CenterOfMassComputationPtr_t;
-using hpp::pinocchio::Device;
-using hpp::pinocchio::DevicePtr_t;
+using hpp::model::Device;
+using hpp::model::DevicePtr_t;
 
 int main( int argc, char *argv[] )
 {
@@ -42,8 +33,8 @@ int main( int argc, char *argv[] )
   DynamicsState ini_state;
 
   // define robot initial state from HPP
-  DevicePtr_t red = HumanoidRobot::create ("red");
-  loadRobotModel(red, 0, "", "freeflyer", "red_description", "red_robot", "", "");
+  DevicePtr_t red = Device::create ("red");
+  hpp::model::urdf::loadRobotModel(red, "freeflyer", "red_description", "red_robot", "", "");
   
   vector_t standing (red->configSize ());
   standing << -2.0, 0, 0.8, 0, 0, 0, 1, // 7, notation (x, y, z, w)

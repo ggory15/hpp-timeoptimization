@@ -22,7 +22,7 @@
 # include <vector>
 # include <Eigen/Core>
 # include <hpp/core/fwd.hh>
-# include <hpp/pinocchio/fwd.hh>
+# include <hpp/model/fwd.hh>
 # include <hpp/timeopt/yaml_eigen.h>
 # include <hpp/timeopt/config.hh>
 
@@ -50,15 +50,11 @@ namespace hpp {
     typedef core::DevicePtr_t DevicePtr_t;
     typedef Eigen::Quaternion<double> quaternion_t;
 
-    typedef pinocchio::CenterOfMassComputationPtr_t CenterOfMassComputationPtr_t;
+    typedef model::CenterOfMassComputationPtr_t CenterOfMassComputationPtr_t;
 
-    typedef pinocchio::JointPtr_t JointPtr_t;
-    typedef pinocchio::DevicePtr_t DevicePtr_t;
-    typedef pinocchio::HumanoidRobotPtr_t HumanoidRobotPtr_t;
-    typedef pinocchio::HumanoidRobot HumanoidRobot;
-    typedef pinocchio::LiegroupElement LiegroupElement;
-    typedef pinocchio::LiegroupSpace LiegroupSpace;
-    typedef pinocchio::LiegroupSpacePtr_t LiegroupSpacePtr_t;
+    typedef model::JointPtr_t JointPtr_t;
+    typedef model::DevicePtr_t DevicePtr_t;
+    
   } // namespace timeopt
 } // namespace hpp
 

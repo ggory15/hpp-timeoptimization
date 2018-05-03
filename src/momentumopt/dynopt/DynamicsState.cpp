@@ -17,18 +17,18 @@
 
 #include <hpp/timeopt/momentumopt/dynopt/DynamicsState.hpp>
 
-#include "hpp/pinocchio/center-of-mass-computation.hh"
-#include <hpp/pinocchio/device.hh>
-#include <hpp/pinocchio/joint.hh>
-#include "hpp/pinocchio/urdf/util.hh"
+#include "hpp/model/center-of-mass-computation.hh"
+#include <hpp/model/device.hh>
+#include <hpp/model/joint.hh>
+//#include "hpp/pinocchio/urdf/util.hh"
 
-using namespace hpp::pinocchio::urdf;
+//using namespace hpp::pinocchio::urdf;
 
-using hpp::pinocchio::CenterOfMassComputation;
-using hpp::pinocchio::CenterOfMassComputationPtr_t;
-using hpp::pinocchio::JointPtr_t;
-using hpp::pinocchio::Device;
-using hpp::pinocchio::DevicePtr_t;
+using hpp::model::CenterOfMassComputation;
+using hpp::model::CenterOfMassComputationPtr_t;
+using hpp::model::JointPtr_t;
+using hpp::model::Device;
+using hpp::model::DevicePtr_t;
 
 namespace hpp{
     namespace timeopt {
@@ -98,12 +98,8 @@ namespace hpp{
       }
 
       void DynamicsState::fillInitialBodyState(const DevicePtr_t& robot, const vector3_t& lmom, const vector3_t& amom){
-          CenterOfMassComputationPtr_t comc = CenterOfMassComputation::create (robot);
-          comc->add (robot->rootJoint ());
-          comc->compute (hpp::pinocchio::Device::COM);
-          com_ = comc->com();
-          mass_ = comc->mass();       
-          
+          com_ << robot->positionCenterOfMass()[0], robot->positionCenterOfMass()[1], robot->positionCenterOfMass()[2];
+          mass_ = robot->mass();          
           lmom_=lmom;
           amom_=amom;
       }
@@ -111,8 +107,8 @@ namespace hpp{
         Transform3f tf  (joint->currentTransformation ());
 
         eefs_activation_[eff_id] = active;
-        eefs_orientation_[eff_id] = tf.rotation();
-        eefs_position_[eff_id] = tf.translation();
+        eefs_orientation_[eff_id] = tf.getRotation();
+        eefs_position_[eff_id] = tf.getTranslation();
         eefs_frcs_[eff_id] = force_ratio;
       }
 

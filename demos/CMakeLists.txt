@@ -39,7 +39,7 @@ MACRO(ADD_TESTCASE NAME GENERATED)
 
   # Link against Boost and project library.
   TARGET_LINK_LIBRARIES(${NAME}
-    ${Boost_LIBRARIES} hpp-timeopt yaml-cpp hpp-core hpp-pinocchio
+    ${Boost_LIBRARIES} hpp-timeopt yaml-cpp hpp-core hpp-model hpp-model-urdf
     )
 ENDMACRO(ADD_TESTCASE)
 
