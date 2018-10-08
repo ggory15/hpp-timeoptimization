@@ -1,4 +1,4 @@
-# hpp-timeopt for quadrupted robot
+# hpp-timeopt
 
 This is a modified version of the software for optimization of centroidal momentum dyanmics (https://git-amd.tuebingen.mpg.de/bponton/timeoptimization) in order to use in HPP (https://github.com/humanoid-path-planner). This module can generate COM trajectory for humanoid robot using time-optimization by pondon's works.
 

@@ -90,6 +90,7 @@ namespace hpp{
 
         /*! function to have access to time required to solve the optimization problem */
         const double& solveTime() const { return solve_time_; }
+        const int& numtimestep() const {return num_timesteps_;}
 
       private:
         /*! Getter and setter methods for getting the planner variables  */
@@ -186,7 +187,7 @@ namespace hpp{
         bool has_converged_;
 
         /*! helper integer variables for the optimization problem */
-        int size_, num_vars_;
+        int size_, num_vars_, num_timesteps_;
 
         /*! helper double variables for the optimization problem */
         double solve_time_, convergence_err_, last_convergence_err_, mass_times_gravity_;

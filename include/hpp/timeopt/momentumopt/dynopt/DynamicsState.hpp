@@ -63,6 +63,8 @@ namespace hpp{
 
             const double& time() const { return dtime_; }
             const double& mass() const { return mass_; }
+            const double& timehorizon() const {return timehorizon_;}
+            
             const Eigen::Vector3d& centerOfMass() const { return com_; }
             const Eigen::Vector3d& linearMomentum() const { return lmom_; }
             const Eigen::Vector3d& angularMomentum() const { return amom_; }
@@ -99,12 +101,14 @@ namespace hpp{
 
             // Helper functions for HPP
             void fillInitialBodyState(const DevicePtr_t& robot, const vector3_t& lmom=Eigen::Vector3d::Zero(), const vector3_t& amom=Eigen::Vector3d::Zero());
+            void fillInitialBodyState(const vector3_t& com, const double& mass, const vector3_t& lmom=Eigen::Vector3d::Zero(), const vector3_t& amom=Eigen::Vector3d::Zero());
             void fillInitialLimbState(const JointPtr_t& joint, const int& eff_id, const bool& active, const vector3_t& force_ratio=Eigen::Vector3d::Zero());
             void setFinalcom(const vector3_t& com_goal){comd_ = com_goal;}
             void setMass(const double& mass) {mass_ = mass;}
+            void setTimehorizon(const double& timehorizon) {timehorizon_ = timehorizon;}
 
         private:
-              double dtime_, mass_;
+              double dtime_, mass_, timehorizon_;
               Eigen::Vector3d com_, amom_, lmom_, amomd_, lmomd_, comd_;
 
               IntArray eefs_ids_;

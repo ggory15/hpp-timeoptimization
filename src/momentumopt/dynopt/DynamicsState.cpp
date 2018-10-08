@@ -107,6 +107,12 @@ namespace hpp{
           lmom_=lmom;
           amom_=amom;
       }
+      void DynamicsState::fillInitialBodyState(const vector3_t& com, const double& mass, const vector3_t& lmom, const vector3_t& amom){
+          com_ = com;
+          mass_ = mass;
+          lmom_ = lmom;
+          amom_ = amom;
+      }
       void DynamicsState::fillInitialLimbState(const JointPtr_t& joint, const int& eff_id, const bool& active, const vector3_t& force_ratio){
         Transform3f tf  (joint->currentTransformation ());
 
