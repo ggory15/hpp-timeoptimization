@@ -36,7 +36,7 @@ namespace hpp{
           ~ContactPlanInterface(){}
 
           void initialize(const PlannerSetting& planner_setting);
-          void fillDynamicsSequence(DynamicsSequence& dynamics_sequence);
+          void fillDynamicsSequence(DynamicsSequence& dynamics_sequence, const int num_timestep);
 
           ContactSequence& contactSequence() { return contact_sequence_; }
           const ContactSequence& contactSequence() const { return contact_sequence_; }

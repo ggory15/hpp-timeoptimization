@@ -17,15 +17,15 @@
 
 #include <hpp/timeopt/momentumopt/dynopt/DynamicsState.hpp>
 
-#include "hpp/pinocchio/center-of-mass-computation.hh"
+//#include "hpp/pinocchio/center-of-mass-computation.hh"
 #include <hpp/pinocchio/device.hh>
 #include <hpp/pinocchio/joint.hh>
 #include "hpp/pinocchio/urdf/util.hh"
 
 using namespace hpp::pinocchio::urdf;
 
-using hpp::pinocchio::CenterOfMassComputation;
-using hpp::pinocchio::CenterOfMassComputationPtr_t;
+//using hpp::pinocchio::CenterOfMassComputation;
+//using hpp::pinocchio::CenterOfMassComputationPtr_t;
 using hpp::pinocchio::JointPtr_t;
 using hpp::pinocchio::Device;
 using hpp::pinocchio::DevicePtr_t;
@@ -98,11 +98,11 @@ namespace hpp{
       }
 
       void DynamicsState::fillInitialBodyState(const DevicePtr_t& robot, const vector3_t& lmom, const vector3_t& amom){
-          CenterOfMassComputationPtr_t comc = CenterOfMassComputation::create (robot);
-          comc->add (robot->rootJoint ());
-          comc->compute (hpp::pinocchio::Device::COM);
-          com_ = comc->com();
-          mass_ = comc->mass();       
+          //CenterOfMassComputationPtr_t comc = CenterOfMassComputation::create (robot);
+          // comc->add (robot->rootJoint ());
+          // comc->compute (hpp::pinocchio::Device::COM);
+          //com_ = comc->com();
+          //mass_ = comc->mass();       
           
           lmom_=lmom;
           amom_=amom;
@@ -114,11 +114,11 @@ namespace hpp{
           amom_ = amom;
       }
       void DynamicsState::fillInitialLimbState(const JointPtr_t& joint, const int& eff_id, const bool& active, const vector3_t& force_ratio){
-        Transform3f tf  (joint->currentTransformation ());
+        //Transform3f tf  (joint->currentTransformation ());
 
         eefs_activation_[eff_id] = active;
-        eefs_orientation_[eff_id] = tf.rotation();
-        eefs_position_[eff_id] = tf.translation();
+        //eefs_orientation_[eff_id] = tf.rotation();
+        //eefs_position_[eff_id] = tf.translation();
         eefs_frcs_[eff_id] = force_ratio;
       }
 

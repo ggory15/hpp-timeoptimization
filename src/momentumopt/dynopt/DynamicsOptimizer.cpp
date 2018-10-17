@@ -37,12 +37,13 @@ namespace hpp{
 
       com_pos_goal_ = ini_state.desiredcenterOfMass(); // for hpp
       mass_times_gravity_ = ini_state_.mass() * this->getSetting().get(PlannerDoubleParam_Gravity);
-        
-      friction_cone_.getCone(this->getSetting().get(PlannerDoubleParam_FrictionCoefficient), cone_matrix_);
-      dynamicsSequence().resize(this->getSetting().get(PlannerIntParam_NumTimesteps));
-      for (int time_id=0; time_id<this->getSetting().get(PlannerIntParam_NumTimesteps); time_id++) { dynamicsSequence().dynamicsState(time_id).time() = this->getSetting().get(PlannerDoubleParam_TimeStep); }
+      num_timesteps_ = std::floor(ini_state_.timehorizon() / this->getSetting().get(PlannerDoubleParam_TimeStep));
 
-      contact_plan_->fillDynamicsSequence(this->dynamicsSequence());
+      friction_cone_.getCone(this->getSetting().get(PlannerDoubleParam_FrictionCoefficient), cone_matrix_);
+      dynamicsSequence().resize(num_timesteps_);
+      for (int time_id=0; time_id<num_timesteps_; time_id++) { dynamicsSequence().dynamicsState(time_id).time() = this->getSetting().get(PlannerDoubleParam_TimeStep); }
+
+      contact_plan_->fillDynamicsSequence(this->dynamicsSequence(), num_timesteps_);
       this->initializeOptimizationVariables();
     }
 
@@ -52,15 +53,15 @@ namespace hpp{
       double inf_value = SolverSetting::inf;
 
       // center of mass, linear and angular momentum
-      com_.initialize('C', 3, this->getSetting().get(PlannerIntParam_NumTimesteps), -inf_value, inf_value, num_vars_);
-      lmom_.initialize('C', 3, this->getSetting().get(PlannerIntParam_NumTimesteps), -inf_value, inf_value, num_vars_);
-      amom_.initialize('C', 3, this->getSetting().get(PlannerIntParam_NumTimesteps), -inf_value, inf_value, num_vars_);
+      com_.initialize('C', 3, num_timesteps_, -inf_value, inf_value, num_vars_);
+      lmom_.initialize('C', 3, num_timesteps_, -inf_value, inf_value, num_vars_);
+      amom_.initialize('C', 3, num_timesteps_, -inf_value, inf_value, num_vars_);
 
       // time variable, linear and angular momentum rates
       if (this->getSetting().heuristic() == Heuristic::TimeOptimization) {
-        dt_.initialize('C', 1, this->getSetting().get(PlannerIntParam_NumTimesteps), -inf_value, inf_value, num_vars_);
-        lmomd_.initialize('C', 3, this->getSetting().get(PlannerIntParam_NumTimesteps), -inf_value, inf_value, num_vars_);
-        amomd_.initialize('C', 3, this->getSetting().get(PlannerIntParam_NumTimesteps), -inf_value, inf_value, num_vars_);
+        dt_.initialize('C', 1, num_timesteps_, -inf_value, inf_value, num_vars_);
+        lmomd_.initialize('C', 3, num_timesteps_, -inf_value, inf_value, num_vars_);
+        amomd_.initialize('C', 3, num_timesteps_, -inf_value, inf_value, num_vars_);
       }
 
       // upper and lower bound variables, forces, cops, torques
@@ -136,11 +137,11 @@ namespace hpp{
                   quad_objective_.addQuaTerm(this->getSetting().get(PlannerVectorParam_WeightCenterOfMassViapoint)[axis_id], LinExpr(vars_[com_.id(axis_id,int(this->getSetting().get(PlannerCVectorParam_Viapoints)[via_id](0)/this->getSetting().get(PlannerDoubleParam_TimeStep)))]) - LinExpr(this->getSetting().get(PlannerCVectorParam_Viapoints)[via_id](axis_id+1)) );
         }
 
-        for (int time_id=0; time_id<this->getSetting().get(PlannerIntParam_NumTimesteps); time_id++) {
+        for (int time_id=0; time_id<num_timesteps_; time_id++) {
           for (int axis_id=0; axis_id<3; axis_id++) {
 
             // penalty on center of mass, linear and angular momentum
-            if (time_id==this->getSetting().get(PlannerIntParam_NumTimesteps)-1) {
+            if (time_id==num_timesteps_-1) {
                   quad_objective_.addQuaTerm(this->getSetting().get(PlannerVectorParam_WeightCenterOfMass)[axis_id], LinExpr(vars_[com_.id(axis_id,time_id)]) - LinExpr(com_pos_goal_[axis_id]));
                   quad_objective_.addQuaTerm(this->getSetting().get(PlannerVectorParam_WeightFinalLinearMomentum)[axis_id], LinExpr(vars_[lmom_.id(axis_id,time_id)]) - LinExpr(ref_sequence.dynamicsState(time_id).linearMomentum()[axis_id]));
                   quad_objective_.addQuaTerm(this->getSetting().get(PlannerVectorParam_WeightFinalAngularMomentum)[axis_id], LinExpr(vars_[amom_.id(axis_id,time_id)]) - LinExpr(ref_sequence.dynamicsState(time_id).angularMomentum()[axis_id]));
@@ -183,7 +184,7 @@ namespace hpp{
 
                 // next force
                 LinExpr next_force = 0.0;
-                if (time_id==this->getSetting().get(PlannerIntParam_NumTimesteps)-1) { next_force = current_force; }
+                if (time_id==num_timesteps_-1) { next_force = current_force; }
                 else {
                   if (dynamicsSequence().dynamicsState(time_id+1).endeffectorActivation(eff_id))
                     next_force = vars_[frc_world_[eff_id].id(axis_id,dynamicsSequence().dynamicsState(time_id+1).endeffectorActivationId(eff_id))];
@@ -220,7 +221,7 @@ namespace hpp{
         }
 
         if (!is_first_time && this->getSetting().heuristic() == Heuristic::TimeOptimization) {
-          for (int time_id=0; time_id<this->getSetting().get(PlannerIntParam_NumTimesteps); time_id++) {
+          for (int time_id=0; time_id<num_timesteps_; time_id++) {
             for (int eff_id=0; eff_id<this->getSetting().get(PlannerIntParam_NumActiveEndeffectors); eff_id++) {
               if (dynamicsSequence().dynamicsState(time_id).endeffectorActivation(eff_id)) {
                 Eigen::Matrix3d rot = dynamicsSequence().dynamicsState(time_id).endeffectorOrientation(eff_id).toRotationMatrix();
@@ -268,13 +269,13 @@ namespace hpp{
         // constant time horizon with time adaptation
         if (this->getSetting().get(PlannerBoolParam_IsTimeHorizonFixed) && this->getSetting().heuristic() == Heuristic::TimeOptimization) {
           lin_cons_ = 0.0;
-          for (int time_id=0; time_id<this->getSetting().get(PlannerIntParam_NumTimesteps); time_id++)
+          for (int time_id=0; time_id<num_timesteps_; time_id++)
                 lin_cons_ += vars_[dt_.id(0,time_id)];
-          model_.addLinConstr(lin_cons_, "=", this->getSetting().get(PlannerIntParam_NumTimesteps)*this->getSetting().get(PlannerDoubleParam_TimeStep));
+          model_.addLinConstr(lin_cons_, "=", num_timesteps_*this->getSetting().get(PlannerDoubleParam_TimeStep));
         }
 
         // upper and lower bounds constraints
-        for (int time_id=0; time_id<this->getSetting().get(PlannerIntParam_NumTimesteps); time_id++) {
+        for (int time_id=0; time_id<num_timesteps_; time_id++) {
               if (this->getSetting().heuristic() == Heuristic::TimeOptimization) {
             model_.addLinConstr(vars_[dt_.id(0,time_id)], ">", this->getSetting().get(PlannerVectorParam_TimeRange)[0]);
             model_.addLinConstr(vars_[dt_.id(0,time_id)], "<", this->getSetting().get(PlannerVectorParam_TimeRange)[1]);
@@ -292,7 +293,7 @@ namespace hpp{
         }
 
         // friction cone constraints
-        for (int time_id=0; time_id<this->getSetting().get(PlannerIntParam_NumTimesteps); time_id++) {
+        for (int time_id=0; time_id<num_timesteps_; time_id++) {
           for (int eff_id=0; eff_id<this->getSetting().get(PlannerIntParam_NumActiveEndeffectors); eff_id++) {
             if (dynamicsSequence().dynamicsState(time_id).endeffectorContactType(eff_id) != ContactType::FullContact) {
               if (dynamicsSequence().dynamicsState(time_id).endeffectorActivation(eff_id)) {
@@ -320,7 +321,7 @@ namespace hpp{
           }
         }
 
-        for (int time_id=0; time_id<this->getSetting().get(PlannerIntParam_NumTimesteps); time_id++) {
+        for (int time_id=0; time_id<num_timesteps_; time_id++) {
               if (this->getSetting().heuristic() == Heuristic::TimeOptimization) {
                 if (is_first_time) {
                   // center of mass constraint
@@ -449,7 +450,7 @@ namespace hpp{
           default: { qapprox = QuadConstrApprox::None; break; }
         }
 
-        for (int time_id=0; time_id<this->getSetting().get(PlannerIntParam_NumTimesteps); time_id++) {
+        for (int time_id=0; time_id<num_timesteps_; time_id++) {
           for (int eff_id=0; eff_id<this->getSetting().get(PlannerIntParam_NumActiveEndeffectors); eff_id++) {
             if (dynamicsSequence().dynamicsState(time_id).endeffectorActivation(eff_id)) {
               Eigen::Matrix3d rot = dynamicsSequence().dynamicsState(time_id).endeffectorOrientation(eff_id).toRotationMatrix();
@@ -522,12 +523,12 @@ namespace hpp{
 
       // computation of linear momentum out of forces
       Eigen::Vector3d frc, len, trq;
-      Eigen::MatrixXd compos(3,this->getSetting().get(PlannerIntParam_NumTimesteps)); compos.setZero();
-      Eigen::MatrixXd linmom(3,this->getSetting().get(PlannerIntParam_NumTimesteps)); linmom.setZero();
-      Eigen::MatrixXd angmom(3,this->getSetting().get(PlannerIntParam_NumTimesteps)); angmom.setZero();
+      Eigen::MatrixXd compos(3,num_timesteps_); compos.setZero();
+      Eigen::MatrixXd linmom(3,num_timesteps_); linmom.setZero();
+      Eigen::MatrixXd angmom(3,num_timesteps_); angmom.setZero();
 
       if (this->getSetting().heuristic() == Heuristic::TimeOptimization) {
-        for (int time_id=0; time_id<this->getSetting().get(PlannerIntParam_NumTimesteps); time_id++) {
+        for (int time_id=0; time_id<num_timesteps_; time_id++) {
           if (time_id==0) {
             compos.col(time_id) = ini_state_.centerOfMass();
             linmom.col(time_id) = ini_state_.linearMomentum();
@@ -550,7 +551,7 @@ namespace hpp{
       }
 
       // computation of angular momentum out of forces and lengths
-      for (int time_id=0; time_id<this->getSetting().get(PlannerIntParam_NumTimesteps); time_id++) {
+      for (int time_id=0; time_id<num_timesteps_; time_id++) {
         if (time_id == 0) { angmom.col(time_id) = ini_state_.angularMomentum(); }
         else              { angmom.col(time_id) = angmom.col(time_id-1); }
 
@@ -585,9 +586,9 @@ namespace hpp{
         // computing convergence error
         if (is_first_time) { last_convergence_err_ = SolverSetting::inf; }
         else               { last_convergence_err_ = convergence_err_; }
-        com_.getGuessValue(com_guess_);   double com_err  = (com_guess_-compos).norm()/this->getSetting().get(PlannerIntParam_NumTimesteps);
-        lmom_.getGuessValue(lmom_guess_); double lmom_err = (lmom_guess_-linmom).norm()/this->getSetting().get(PlannerIntParam_NumTimesteps);
-        amom_.getGuessValue(amom_guess_); double amom_err = (amom_guess_-angmom).norm()/this->getSetting().get(PlannerIntParam_NumTimesteps);
+        com_.getGuessValue(com_guess_);   double com_err  = (com_guess_-compos).norm()/num_timesteps_;
+        lmom_.getGuessValue(lmom_guess_); double lmom_err = (lmom_guess_-linmom).norm()/num_timesteps_;
+        amom_.getGuessValue(amom_guess_); double amom_err = (amom_guess_-angmom).norm()/num_timesteps_;
         convergence_err_ = std::max(com_err, std::max(lmom_err, amom_err));
 
         if (convergence_err_ < this->getSetting().get(PlannerDoubleParam_MaxTimeResidualTolerance)) { has_converged_ = true; }
@@ -624,44 +625,44 @@ namespace hpp{
     void DynamicsOptimizer::storeSolution()
     {
       com_.getGuessValue(mat_guess_);
-      for (int time_id=0; time_id<this->getSetting().get(PlannerIntParam_NumTimesteps); time_id++) {
+      for (int time_id=0; time_id<num_timesteps_; time_id++) {
         dynamicsSequence().dynamicsState(time_id).centerOfMass() = Eigen::Vector3d(mat_guess_.block<3,1>(0,time_id));
       }
       lmom_.getGuessValue(mat_guess_);
-      for (int time_id=0; time_id<this->getSetting().get(PlannerIntParam_NumTimesteps); time_id++)
+      for (int time_id=0; time_id<num_timesteps_; time_id++)
         dynamicsSequence().dynamicsState(time_id).linearMomentum() = Eigen::Vector3d(mat_guess_.block<3,1>(0,time_id));
 
       amom_.getGuessValue(mat_guess_);
-      for (int time_id=0; time_id<this->getSetting().get(PlannerIntParam_NumTimesteps); time_id++)
+      for (int time_id=0; time_id<num_timesteps_; time_id++)
         dynamicsSequence().dynamicsState(time_id).angularMomentum() = Eigen::Vector3d(mat_guess_.block<3,1>(0,time_id));
 
       if (this->getSetting().heuristic() == Heuristic::TimeOptimization) {
         dt_.getGuessValue(mat_guess_);
-        for (int time=0; time<this->getSetting().get(PlannerIntParam_NumTimesteps); time++)
+        for (int time=0; time<num_timesteps_; time++)
           dynamicsSequence().dynamicsState(time).time() = mat_guess_(0,time);
 
         lmomd_.getGuessValue(mat_guess_);
-        for (int time_id=0; time_id<this->getSetting().get(PlannerIntParam_NumTimesteps); time_id++)
+        for (int time_id=0; time_id<num_timesteps_; time_id++)
           dynamicsSequence().dynamicsState(time_id).linearMomentumRate() = Eigen::Vector3d(mat_guess_.block<3,1>(0,time_id));
 
         amomd_.getGuessValue(mat_guess_);
-        for (int time_id=0; time_id<this->getSetting().get(PlannerIntParam_NumTimesteps); time_id++)
+        for (int time_id=0; time_id<num_timesteps_; time_id++)
           dynamicsSequence().dynamicsState(time_id).angularMomentumRate() = Eigen::Vector3d(mat_guess_.block<3,1>(0,time_id));
       }
 
       for (int eff_id=0; eff_id<this->getSetting().get(PlannerIntParam_NumActiveEndeffectors); eff_id++) {
         frc_world_[eff_id].getGuessValue(mat_guess_);
-        for (int time_id=0; time_id<this->getSetting().get(PlannerIntParam_NumTimesteps); time_id++)
+        for (int time_id=0; time_id<num_timesteps_; time_id++)
           if (dynamicsSequence().dynamicsState(time_id).endeffectorActivation(eff_id))
             dynamicsSequence().dynamicsState(time_id).endeffectorForce(eff_id) = Eigen::Vector3d(mat_guess_.block<3,1>(0,dynamicsSequence().dynamicsState(time_id).endeffectorActivationId(eff_id)));
 
         cop_local_[eff_id].getGuessValue(mat_guess_);
-        for (int time_id=0; time_id<this->getSetting().get(PlannerIntParam_NumTimesteps); time_id++)
+        for (int time_id=0; time_id<num_timesteps_; time_id++)
           if (dynamicsSequence().dynamicsState(time_id).endeffectorActivation(eff_id))
             dynamicsSequence().dynamicsState(time_id).endeffectorCoP(eff_id) = Eigen::Vector3d(mat_guess_(0,dynamicsSequence().dynamicsState(time_id).endeffectorActivationId(eff_id)), mat_guess_(1,dynamicsSequence().dynamicsState(time_id).endeffectorActivationId(eff_id)), 0.0);
 
         trq_local_[eff_id].getGuessValue(mat_guess_);
-        for (int time_id=0; time_id<this->getSetting().get(PlannerIntParam_NumTimesteps); time_id++)
+        for (int time_id=0; time_id<num_timesteps_; time_id++)
           if (dynamicsSequence().dynamicsState(time_id).endeffectorActivation(eff_id))
             dynamicsSequence().dynamicsState(time_id).endeffectorTorque(eff_id) = Eigen::Vector3d(0.0, 0.0, mat_guess_(0,dynamicsSequence().dynamicsState(time_id).endeffectorActivationId(eff_id)));
       }
@@ -680,34 +681,35 @@ namespace hpp{
           qcqp_cfg["dynopt_params"]["robot_mass"] = ini_state_.mass();
           qcqp_cfg["dynopt_params"]["n_act_eefs"] = this->getSetting().get(PlannerIntParam_NumActiveEndeffectors);
           qcqp_cfg["dynopt_params"]["ini_com"] = ini_state_.centerOfMass();
-          qcqp_cfg["dynopt_params"]["time_horizon"] = this->getSetting().get(PlannerDoubleParam_TimeHorizon);
+          qcqp_cfg["dynopt_params"]["time_horizon"] = ini_state_.timehorizon();
+          qcqp_cfg["dynopt_params"]["num_timesteps_"] = num_timesteps_;
 
           com_.getGuessValue(mat_guess_);   qcqp_cfg["dynopt_params"]["com_motion"] = mat_guess_;
           lmom_.getGuessValue(mat_guess_);  qcqp_cfg["dynopt_params"]["lin_mom"] = mat_guess_;
           amom_.getGuessValue(mat_guess_);  qcqp_cfg["dynopt_params"]["ang_mom"] = mat_guess_;
 
           // building momentum references
-          for (int time_id=0; time_id<this->getSetting().get(PlannerIntParam_NumTimesteps); time_id++) { mat_guess_.col(time_id) = ref_sequence.dynamicsState(time_id).centerOfMass();  } qcqp_cfg["dynopt_params"]["com_motion_ref"] = mat_guess_;
-          for (int time_id=0; time_id<this->getSetting().get(PlannerIntParam_NumTimesteps); time_id++) { mat_guess_.col(time_id) = ref_sequence.dynamicsState(time_id).linearMomentum(); } qcqp_cfg["dynopt_params"]["lin_mom_ref"] = mat_guess_;
-          for (int time_id=0; time_id<this->getSetting().get(PlannerIntParam_NumTimesteps); time_id++) { mat_guess_.col(time_id) = ref_sequence.dynamicsState(time_id).angularMomentum(); } qcqp_cfg["dynopt_params"]["ang_mom_ref"] = mat_guess_;
+          for (int time_id=0; time_id<num_timesteps_; time_id++) { mat_guess_.col(time_id) = ref_sequence.dynamicsState(time_id).centerOfMass();  } qcqp_cfg["dynopt_params"]["com_motion_ref"] = mat_guess_;
+          for (int time_id=0; time_id<num_timesteps_; time_id++) { mat_guess_.col(time_id) = ref_sequence.dynamicsState(time_id).linearMomentum(); } qcqp_cfg["dynopt_params"]["lin_mom_ref"] = mat_guess_;
+          for (int time_id=0; time_id<num_timesteps_; time_id++) { mat_guess_.col(time_id) = ref_sequence.dynamicsState(time_id).angularMomentum(); } qcqp_cfg["dynopt_params"]["ang_mom_ref"] = mat_guess_;
 
           // saving vector of time-steps
-          mat_guess_.resize(1, this->getSetting().get(PlannerIntParam_NumTimesteps)); mat_guess_.setZero();
+          mat_guess_.resize(1, num_timesteps_); mat_guess_.setZero();
           mat_guess_(0,0) = dynamicsSequence().dynamicsState(0).time();
-          for (int time_id=1; time_id<this->getSetting().get(PlannerIntParam_NumTimesteps); time_id++)
+          for (int time_id=1; time_id<num_timesteps_; time_id++)
             mat_guess_(0,time_id) = mat_guess_(0,time_id-1) + dynamicsSequence().dynamicsState(time_id).time();
           qcqp_cfg["dynopt_params"]["time_vec"] = mat_guess_;
 
           // saving vector of forces, torques and cops
           for (int eff_id=0; eff_id<this->getSetting().get(PlannerIntParam_NumActiveEndeffectors); eff_id++) {
-            mat_guess_.resize(3, this->getSetting().get(PlannerIntParam_NumTimesteps)); mat_guess_.setZero();
-            for (int time_id=0; time_id<this->getSetting().get(PlannerIntParam_NumTimesteps); time_id++)
+            mat_guess_.resize(3, num_timesteps_); mat_guess_.setZero();
+            for (int time_id=0; time_id<num_timesteps_; time_id++)
               if (dynamicsSequence().dynamicsState(time_id).endeffectorActivation(eff_id))
                 mat_guess_.col(time_id).head(3) = dynamicsSequence().dynamicsState(time_id).endeffectorForce(eff_id);
             qcqp_cfg["dynopt_params"]["eef_frc_"+std::to_string(eff_id)] = mat_guess_;
 
-            mat_guess_.resize(1, this->getSetting().get(PlannerIntParam_NumTimesteps)); mat_guess_.setZero();
-            for (int time_id=0; time_id<this->getSetting().get(PlannerIntParam_NumTimesteps); time_id++)
+            mat_guess_.resize(1, num_timesteps_); mat_guess_.setZero();
+            for (int time_id=0; time_id<num_timesteps_; time_id++)
               if (dynamicsSequence().dynamicsState(time_id).endeffectorActivation(eff_id))
                 mat_guess_(0, time_id) = dynamicsSequence().dynamicsState(time_id).endeffectorTorque(eff_id).z();
             qcqp_cfg["dynopt_params"]["eef_trq_"+std::to_string(eff_id)] = mat_guess_;
@@ -727,10 +729,10 @@ namespace hpp{
                 foot_state(0) = contact_plan_->contactSequence().endeffectorContacts(eff_id)[cnt_id].contactActivationTime();
                 foot_state(1) = contact_plan_->contactSequence().endeffectorContacts(eff_id)[cnt_id].contactDeactivationTime();
                 foot_state.segment(2,3) = contact_plan_->contactSequence().endeffectorContacts(eff_id)[cnt_id].contactPosition();
-                foot_state(5) = contact_plan_->contactSequence().endeffectorContacts(eff_id)[cnt_id].contactOrientation().x();
-                foot_state(6) = contact_plan_->contactSequence().endeffectorContacts(eff_id)[cnt_id].contactOrientation().y();
-                foot_state(7) = contact_plan_->contactSequence().endeffectorContacts(eff_id)[cnt_id].contactOrientation().z();
-                foot_state(8) = contact_plan_->contactSequence().endeffectorContacts(eff_id)[cnt_id].contactOrientation().w();
+                foot_state(5) = contact_plan_->contactSequence().endeffectorContacts(eff_id)[cnt_id].contactOrientation().w();
+                foot_state(6) = contact_plan_->contactSequence().endeffectorContacts(eff_id)[cnt_id].contactOrientation().x();
+                foot_state(7) = contact_plan_->contactSequence().endeffectorContacts(eff_id)[cnt_id].contactOrientation().y();
+                foot_state(8) = contact_plan_->contactSequence().endeffectorContacts(eff_id)[cnt_id].contactOrientation().z();
                 qcqp_cfg["cntopt_params"]["contact_sequence_" + std::to_string(eff_id)+"  #" + std::to_string(cnt_id)] = foot_state;
               }              
             }          

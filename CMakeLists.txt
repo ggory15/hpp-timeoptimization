@@ -100,10 +100,10 @@ get_filename_component(TEST_PATH test ABSOLUTE)
 get_filename_component(CONFIG_PATH config ABSOLUTE)
 
 ADD_SUBDIRECTORY(src)
-ADD_SUBDIRECTORY(test/opt_solver)
-ADD_SUBDIRECTORY(test/momentumopt)
+#ADD_SUBDIRECTORY(test/opt_solver)
+#ADD_SUBDIRECTORY(test/momentumopt)
 
-ADD_SUBDIRECTORY(demos)
+#ADD_SUBDIRECTORY(demos)
 
 PKG_CONFIG_APPEND_LIBS("hpp-timeopt")
 

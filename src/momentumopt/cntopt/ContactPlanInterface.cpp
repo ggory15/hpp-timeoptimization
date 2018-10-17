@@ -9,7 +9,7 @@ namespace hpp{
         planner_setting_ = &planner_setting;
       }
 
-      void ContactPlanInterface::fillDynamicsSequence(DynamicsSequence& dynamics_sequence)
+      void ContactPlanInterface::fillDynamicsSequence(DynamicsSequence& dynamics_sequence, const int num_timestep)
       {
         // configuration of end-effectors during contact
         dynamics_sequence.activeEndeffectorSteps().setZero();
@@ -18,7 +18,7 @@ namespace hpp{
           int ini_id = 0, end_id = contact_sequence_.endeffectorContacts(eff_id).size();
 
           for (int cnt_id=ini_id; cnt_id<end_id; cnt_id++) {
-            for (int time_id=0; time_id<this->getSetting().get(PlannerIntParam_NumTimesteps); time_id++) {
+            for (int time_id=0; time_id<num_timestep; time_id++) {
               double current_time = double(time_id+1.0)*this->getSetting().get(PlannerDoubleParam_TimeStep);
               if (current_time>=contact_sequence_.endeffectorContacts(eff_id)[cnt_id].contactActivationTime() &&
                   current_time< contact_sequence_.endeffectorContacts(eff_id)[cnt_id].contactDeactivationTime())
